@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model caixa {
+  id               BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  tipo_movimento   String     @db.VarChar(255)
+  titulo           String     @db.VarChar(255)
+  descricao        String     @db.VarChar(255)
+  valor            Decimal?   @db.Decimal(8, 2)
+  data             String     @db.VarChar(255)
+  user_id          BigInt     @db.UnsignedBigInt
+  inscritos_id     BigInt?    @db.UnsignedBigInt
+  created_at       DateTime?  @db.Timestamp(0)
+  updated_at       DateTime?  @db.Timestamp(0)
+  numero_pagamento String?    @db.VarChar(255)
+  inscritos        inscritos? @relation(fields: [inscritos_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "caixa_inscritos_id_foreign")
+  users            users      @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "caixa_user_id_foreign")
+
+  @@index([inscritos_id], map: "caixa_inscritos_id_foreign")
+  @@index([user_id], map: "caixa_user_id_foreign")
+}
+
+model failed_jobs {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid       String   @unique(map: "failed_jobs_uuid_unique") @db.VarChar(255)
+  connection String   @db.Text
+  queue      String   @db.Text
+  payload    String   @db.LongText
+  exception  String   @db.LongText
+  failed_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model inscricao_historico {
+  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  inscritos_id BigInt    @db.UnsignedBigInt
+  tipo         String    @db.VarChar(255)
+  data         DateTime  @db.DateTime(0)
+  titulo       String    @db.VarChar(255)
+  descricao    String?   @db.VarChar(255)
+  inscritos    inscritos @relation(fields: [inscritos_id], references: [id], onUpdate: Restrict, map: "inscricao_historico_inscritos_id_foreign")
+
+  @@index([inscritos_id], map: "inscricao_historico_inscritos_id_foreign")
+}
+
+model inscritos {
+  id                         BigInt                @id @default(autoincrement()) @db.UnsignedBigInt
+  nome                       String                @db.VarChar(255)
+  data_inscricao             DateTime              @db.DateTime(0)
+  email                      String                @db.VarChar(255)
+  sexo                       String                @db.VarChar(255)
+  data_nascimento            DateTime              @db.Date
+  pais_residencia            String                @db.VarChar(255)
+  diocese                    String                @db.VarChar(255)
+  paroquia                   String                @db.VarChar(255)
+  ilha                       String                @db.VarChar(255)
+  responsabilidade_pastoral  String                @db.VarChar(255)
+  escolaridade               String?               @db.VarChar(255)
+  profissao                  String?               @db.VarChar(255)
+  telemovel                  String                @db.VarChar(255)
+  pertence_a_grupo_religioso String                @db.VarChar(255)
+  ja_participou_na_jornada   String                @db.VarChar(255)
+  tem_necessidade_especial   String                @db.VarChar(255)
+  precisa_visto_portugal     String                @db.VarChar(255)
+  anexo                      String                @db.VarChar(255)
+  created_at                 DateTime?             @db.Timestamp(0)
+  updated_at                 DateTime?             @db.Timestamp(0)
+  grupo                      String?               @db.VarChar(255)
+  pais_ano_participacao_jmj  String?               @db.VarChar(255)
+  necessidade_especial       String?               @db.VarChar(255)
+  nome_rede_social           String?               @db.VarChar(255)
+  estado                     String?               @db.VarChar(255)
+  caixa                      caixa[]
+  inscricao_historico        inscricao_historico[]
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String @db.VarChar(255)
+  batch     Int
+}
+
+model personal_access_tokens {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenable_type String    @db.VarChar(255)
+  tokenable_id   BigInt    @db.UnsignedBigInt
+  name           String    @db.VarChar(255)
+  token          String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
+  abilities      String?   @db.Text
+  last_used_at   DateTime? @db.Timestamp(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+
+  @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
+}
+
+model users {
+  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name              String    @db.VarChar(255)
+  email             String    @unique(map: "users_email_unique") @db.VarChar(255)
+  email_verified_at DateTime? @db.Timestamp(0)
+  password          String    @db.VarChar(255)
+  remember_token    String?   @db.VarChar(100)
+  created_at        DateTime? @db.Timestamp(0)
+  updated_at        DateTime? @db.Timestamp(0)
+  caixa             caixa[]
+}
